@@ -11,11 +11,14 @@ export async function GET() {
 });
 
     return NextResponse.json(services);
-  } catch (error) {
+    } catch (error) {
     console.error("GET /api/services error:", error);
 
     return NextResponse.json(
-      { error: "Failed to fetch services" },
+      {
+        error: "Failed to fetch services",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }
