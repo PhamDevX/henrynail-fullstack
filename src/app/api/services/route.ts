@@ -54,14 +54,26 @@ if (!admin) {
     });
 
     return NextResponse.json(service, { status: 201 });
-  } catch (error) {
-    console.error("POST /api/services error:", error);
+ } catch (error) {
+  console.error("GET /api/services error:", error);
 
-    return NextResponse.json(
-      { error: "Failed to create service" },
-      { status: 500 }
-    );
-  }
+  const dbUrl = process.env.DATABASE_URL || "";
+
+  let dbHost = "unknown";
+
+  try {
+    dbHost = new URL(dbUrl).hostname;
+  } catch {}
+
+  return NextResponse.json(
+    {
+      error: "Failed to fetch services",
+      dbHost,
+      details: error instanceof Error ? error.message : String(error),
+    },
+    { status: 500 }
+  );
+}
 }export async function PATCH(request: Request) {
   try {
     
