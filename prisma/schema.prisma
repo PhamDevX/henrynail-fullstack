@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}model Customer {
+  id        Int       @id @default(autoincrement())
+  name      String
+  phone     String?
+  instagram String?
+  createdAt DateTime  @default(now())
+
+  bookings Booking[]
+}
+
+model Service {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  duration    Int
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+
+  bookings Booking[]
+}
+
+model Booking {
+  id         Int      @id @default(autoincrement())
+  customerId Int
+  serviceId  Int
+  date       DateTime
+  status     String   @default("PENDING")
+  note       String?
+  createdAt  DateTime @default(now())
+
+  customer Customer @relation(fields: [customerId], references: [id])
+  service  Service  @relation(fields: [serviceId], references: [id])
+}
+model Gallery {
+  id        Int      @id @default(autoincrement())
+  image     String
+  title     String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+model Setting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String?
+  updatedAt DateTime @updatedAt
+}
+model Admin {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  sessions     AdminSession[]
+}
+model AdminSession {
+  id         Int      @id @default(autoincrement())
+  tokenHash  String   @unique
+  adminId    Int
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+
+  admin      Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId])
+  @@index([expiresAt])
+}
+model ShopHoliday {
+  id        Int      @id @default(autoincrement())
+  date      DateTime
+  dateKey   String   @unique
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@index([date])
+}
